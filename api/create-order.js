@@ -23,20 +23,23 @@ export default async function handler(req, res) {
     }
 
     const orderId = "ORD_" + Date.now();
+    const BASE_URL = "https://zap-backend-mu.vercel.app"; // 👈 confirm your domain
 
-    const BASE_URL = "https://zap-backend-mu.vercel.app"; // 🔁 apna domain confirm kar
+    // 🔐 Zap Credentials
+    const API_TOKEN = "add869238024e2008b309519c0d8d263";
+    const SECRET_KEY = "d9f7546f11140e3b652e459e2ee1a366";
 
     const payload = new URLSearchParams();
-    payload.append("token_key", "add869238024e2008b309519c0d8d263");
-    payload.append("secret_key", "d9f7546f11140e3b652e459e2ee1a366");
+    payload.append("api_token", API_TOKEN);
+    payload.append("secret_key", SECRET_KEY);
     payload.append("amount", amount);
     payload.append("order_id", orderId);
-    payload.append("customer_mobile", "9999999999");
+    payload.append("mobile", "9999999999");
     payload.append("redirect_url", BASE_URL + "/success.html");
     payload.append("fail_url", BASE_URL + "/failed.html");
     payload.append("webhook_url", BASE_URL + "/api/webhook");
 
-    const response = await fetch("https://zapupi.com/api/create-order", {
+    const response = await fetch("https://zapupi.com/api/order/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
@@ -52,17 +55,18 @@ export default async function handler(req, res) {
     } catch (err) {
       return res.status(400).json({
         success: false,
-        message: "Invalid JSON from Zap",
+        message: "Zap returned invalid JSON",
         raw_response: text
       });
     }
 
-    // 🔎 Payment URL detection
+    // 🔎 Try to detect payment URL
     const paymentUrl =
       data.payment_url ||
       data.paymentUrl ||
       data.data?.payment_url ||
-      data.data?.paymentUrl;
+      data.data?.paymentUrl ||
+      data.payment_link;
 
     if (!paymentUrl) {
       return res.status(400).json({
@@ -86,4 +90,4 @@ export default async function handler(req, res) {
       error: error.message
     });
   }
-}
+                                 }
