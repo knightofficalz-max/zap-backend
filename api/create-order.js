@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     const ZAP_SECRET = "d9f7546f11140e3b652e459e2ee1a366";
 
     // 🌐 Replace with your real Vercel domain
-    const BASE_URL = "https://yourdomain.vercel.app";
+    const BASE_URL = "https://zap-backend-mu.vercel.app";
 
     const payload = new URLSearchParams();
     payload.append("token_key", ZAP_TOKEN);
