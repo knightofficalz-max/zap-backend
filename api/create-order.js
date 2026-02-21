@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       });
     }
 
-    const orderId = "ORD_" + Date.now();
+    const orderId = Date.now().toString();
 
     const BASE_URL = "https://zap-backend-mu.vercel.app";
 
