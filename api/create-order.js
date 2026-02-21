@@ -15,11 +15,11 @@ export default async function handler(req, res) {
       });
     }
 
-    if (amount < 100) {
-      return res.status(400).json({
-        status: "error",
-        message: "Minimum ₹100 required"
-      });
+    if (amount < 1) {
+  return res.status(400).json({
+    status: "error",
+    message: "Minimum ₹1 required"
+  });
     }
 
     const orderId = Date.now().toString();
