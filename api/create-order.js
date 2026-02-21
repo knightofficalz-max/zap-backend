@@ -40,12 +40,19 @@ export default async function handler(req, res) {
     payload.append("webhook_url", BASE_URL + "/api/webhook");
 
     const response = await fetch("https://zapupi.com/api/order/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: payload
-    });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/x-www-form-urlencoded"
+  },
+  body: payload
+});
+
+const text = await response.text();
+
+return res.status(200).json({
+  zap_status: response.status,
+  zap_text: text
+});
 
     const text = await response.text();
 
