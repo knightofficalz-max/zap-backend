@@ -54,18 +54,8 @@ return res.status(200).json({
   zap_text: text
 });
 
-    const text = await response.text();
-
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (err) {
-      return res.status(400).json({
-        success: false,
-        message: "Zap returned invalid JSON",
-        raw_response: text
-      });
-    }
+    
+    
 
     // 🔎 Try to detect payment URL
     const paymentUrl =
