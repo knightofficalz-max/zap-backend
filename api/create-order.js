@@ -61,12 +61,11 @@ export default async function handler(req, res) {
 
     // ⚡ Zap success response check
     if (data.status !== "success") {
-      return res.status(400).json({
-        success: false,
-        message: "Payment creation failed",
-        error: data
-      });
-    }
+  return res.status(400).json({
+    success: false,
+    full_zap_response: data
+  });
+}
 
     return res.status(200).json({
       success: true,
