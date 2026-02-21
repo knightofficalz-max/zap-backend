@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
 
   if (req.method !== "POST") {
-    return res.status(200).send("Arena X API - POST Only");
+    return res.status(200).send("Arena X API Working");
   }
 
   try {
@@ -10,81 +10,67 @@ export default async function handler(req, res) {
 
     if (!uid || !amount) {
       return res.status(400).json({
-        success: false,
-        message: "Missing uid or amount"
+        status: "error",
+        message: "uid or amount missing"
       });
     }
 
     if (amount < 100) {
       return res.status(400).json({
-        success: false,
+        status: "error",
         message: "Minimum ₹100 required"
       });
     }
 
     const orderId = "ORD_" + Date.now();
-    const BASE_URL = "https://zap-backend-mu.vercel.app"; // 👈 confirm your domain
 
-    // 🔐 Zap Credentials
-    const API_TOKEN = "add869238024e2008b309519c0d8d263";
-    const SECRET_KEY = "d9f7546f11140e3b652e459e2ee1a366";
+    const BASE_URL = "https://zap-backend-mu.vercel.app";
 
     const payload = new URLSearchParams();
-    payload.append("api_token", API_TOKEN);
-    payload.append("secret_key", SECRET_KEY);
+    payload.append("token_key", "add869238024e2008b309519c0d8d263");
+    payload.append("secret_key", "d9f7546f11140e3b652e459e2ee1a366");
     payload.append("amount", amount);
     payload.append("order_id", orderId);
-    payload.append("mobile", "9999999999");
+    payload.append("customer_mobile", "9999999999");
     payload.append("redirect_url", BASE_URL + "/success.html");
-    payload.append("fail_url", BASE_URL + "/failed.html");
-    payload.append("webhook_url", BASE_URL + "/api/webhook");
+    payload.append("remark", "ArenaX Add Cash");
 
-    const response = await fetch("https://zapupi.com/api/order/create", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/x-www-form-urlencoded"
-  },
-  body: payload
-});
+    const response = await fetch("https://zapupi.com/api/create-order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: payload
+    });
 
-const text = await response.text();
+    const data = await response.json();
 
-return res.status(200).json({
-  zap_status: response.status,
-  zap_text: text
-});
+    console.log("Zap Response:", data);
 
-    
-    
+    if (response.ok && data.status === "success") {
 
-    // 🔎 Try to detect payment URL
-    const paymentUrl =
-      data.payment_url ||
-      data.paymentUrl ||
-      data.data?.payment_url ||
-      data.data?.paymentUrl ||
-      data.payment_link;
+      return res.status(200).json({
+        status: "success",
+        paymentUrl: data.payment_url,
+        order_id: orderId
+      });
 
-    if (!paymentUrl) {
+    } else {
+
       return res.status(400).json({
-        success: false,
-        message: "Payment URL not received from Zap",
+        status: "error",
+        message: data.message || "Payment creation failed",
         zap_response: data
       });
-    }
 
-    return res.status(200).json({
-      success: true,
-      paymentUrl: paymentUrl,
-      order_id: orderId
-    });
+    }
 
   } catch (error) {
 
     return res.status(500).json({
-      success: false,
-      message: "Server Error",
-      error: error.message
+      status: "error",
+      message: error.message
     });
+
   }
-                                 }
+}
